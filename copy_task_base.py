@@ -127,8 +127,8 @@ class MLPModel(nn.Module):
 		return float(correct.sum().item()) / (batch_size * K)
 
 
-T = 1000  # Number of zeros after the random numbers
-K = 10  # Number of number at the beginning
+T = 20  # Number of zeros after the random numbers
+K = 5  # Number of number at the beginning
 # K-1 : number of zeros after the delimiter ':'
 
 batch_size = 32
