@@ -9,7 +9,8 @@ The project is a university assignment in the course of mini-project in deep lea
 
 **LSTM.py** - self implementation of lstm cell<br>
 **RNN.py** - self implementation of rnn cell<br>
-**MLP.py** - self implementation of linear<br><br>
+**MLP.py** - self implementation of linear<br>
+**copy_task_base.py** - self implementation of the copy task with 3 different models<br><br>
 
 ### Setup ⚙️
 
@@ -27,6 +28,9 @@ The project is a university assignment in the course of mini-project in deep lea
 
 - Run this command to train the model:
   ```
-  python copy_task_base.py
+  python copy_task_base.py -t [number_of_blanks] -k [number_of_numbers_to_copy] -m [model_name]
   ```
 
+  **number_of_blanks** - choose how deep is your network will need to remember the numbers to copy.
+  **number_of_numbers_to_copy** - choose how many number you will need to copy after the delimiter.
+  **model_name** - choose which model do you want to run: RNN, LSTM or MLP.

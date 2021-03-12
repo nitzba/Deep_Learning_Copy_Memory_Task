@@ -1,11 +1,13 @@
+from argparse import ArgumentParser
+
 import numpy as np
 import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 from MLP import MLPLayer
+import argparse
 from RNN import RNNLayer
 from LSTM import LSTMLayer
-
 
 print(np.__version__)
 print(torch.__version__)
@@ -20,8 +22,8 @@ np.random.seed(seed)
 def copy_data(T, K, batch_size):
 	seq = np.random.randint(1, high=9, size=(batch_size, K))
 	zeros1 = np.zeros((batch_size, T))
-	zeros2 = np.zeros((batch_size, K-1))
-	zeros3 = np.zeros((batch_size, K+T))
+	zeros2 = np.zeros((batch_size, K - 1))
+	zeros3 = np.zeros((batch_size, K + T))
 	marker = 9 * np.ones((batch_size, 1))
 
 	x = torch.LongTensor(np.concatenate((seq, zeros1, marker, zeros2), axis=1))
@@ -44,7 +46,7 @@ class RNNModel(nn.Module):
 		self.m = m
 		self.k = k
 		self.name = 'RNN'
-		self.rnn = nn.RNNCell(m+1, k)
+		self.rnn = nn.RNNCell(m + 1, k)
 		self.V = nn.Linear(k, m)
 		# loss for the copy data
 		self.loss_func = nn.CrossEntropyLoss()
@@ -76,7 +78,7 @@ class LSTMModel(nn.Module):
 		self.m = m
 		self.k = k
 		self.name = 'LSTM'
-		self.lstm = nn.LSTMCell(m+1, k)
+		self.lstm = nn.LSTMCell(m + 1, k)
 		self.V = nn.Linear(k, m)
 		# loss for the copy data
 		self.loss_func = nn.CrossEntropyLoss()
@@ -128,7 +130,7 @@ class MLPModel(nn.Module):
 
 
 T = 20  # Number of zeros after the random numbers
-K = 5  # Number of number at the beginning
+K = 3  # Number of number at the beginning
 # K-1 : number of zeros after the delimiter ':'
 
 batch_size = 32
@@ -140,11 +142,14 @@ n_characters = n_classes + 1
 lr = 1e-3
 print_every = 20
 
+model_name = ""
+
 colors = {'MLP': 'red', 'RNN': 'blue', 'LSTM': 'purple'}
 
+models_ = {'MLP': MLPModel, 'RNN': RNNModel, 'LSTM': LSTMModel}
 
 def main():
-	models = [LSTMModel]
+	models = [models_[model_name]]
 	Accuracy = []
 
 	for model in models:
@@ -185,6 +190,9 @@ def main():
 		Accuracy.append([model.name, acc])
 		print(Accuracy)
 
+		# Save
+		torch.save(model, model_name + "_model.pt")
+
 	plt.title("Time Lag {}".format(T))
 	plt.axhline(y=float(baseline), label='baseline')
 	plt.xlabel('Training Examples')
@@ -193,5 +201,22 @@ def main():
 	plt.legend()
 	plt.show()
 
+
+def get_command_line_args():
+	"""
+	Returns the application arguments parser.
+	"""
+	parser: ArgumentParser = argparse.ArgumentParser()
+	parser.add_argument('-t', '--t_blank', help="Number of blanks until delimiter", default=20)
+	parser.add_argument('-k', '--k_copynum', help="Number of numbers to copy", default=3)
+	parser.add_argument('-m', '--model', help="Choose model RNN, LSTM or MLP", default='MLP')
+	args = parser.parse_args()
+	return args
+
 if __name__ == "__main__":
+	args = get_command_line_args()
+	T = int(args.t_blank)
+	K = int(args.k_copynum)
+	model_name = args.model
+	print(f"T: {T}, K: {K}, model_name: {model_name}")
 	main()
