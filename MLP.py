@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import math
 
+# this is mlp layer
 
 class MLPLayer(nn.Module):
     def __init__(self, in_features, out_features):
